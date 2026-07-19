@@ -1,39 +1,61 @@
 {
-	"name": "agadoo",
-	"version": "3.0.0",
-	"description": "Check whether a package is tree-shakeable",
-	"type": "module",
-	"main": "index.js",
-	"scripts": {
-		"test": "node test"
-	},
-	"bin": {
-		"agadoo": "cli.js"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/Rich-Harris/agadoo.git"
-	},
-	"keywords": [
-		"modules",
-		"bundlers",
-		"rollup",
-		"webpack",
-		"parcel",
-		"tree-shaking"
-	],
-	"author": "Rich Harris",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/Rich-Harris/agadoo/issues"
-	},
-	"homepage": "https://github.com/Rich-Harris/agadoo#readme",
-	"dependencies": {
-		"@rollup/plugin-virtual": "^3.0.1",
-		"acorn": "^8.8.1",
-		"rollup": "^3.5.0"
-	},
-	"devDependencies": {
-		"kleur": "^3.0.3"
-	}
+    "name": "@badisi/agadoo",
+    "version": "3.0.0",
+    "description": "Check whether a package is tree-shakeable.",
+    "homepage": "https://github.com/Badisi/agadoo",
+    "license": "MIT",
+    "author": {
+        "name": "Badisi"
+    },
+    "sideEffects": false,
+    "type": "module",
+    "main": "./index.mjs",
+    "module": "./index.mjs",
+    "exports": {
+        ".": {
+            "default": "./index.mjs"
+        },
+        "./package.json": "./package.json"
+    },
+    "bin": {
+        "bagadoo": "bin/bagadoo"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Badisi/agadoo.git"
+    },
+    "keywords": [
+        "modules",
+        "bundlers",
+        "rollup",
+        "webpack",
+        "parcel",
+        "tree-shaking",
+        "tree-shakable",
+        "esm"
+    ],
+    "scripts": {
+        "check-updates": "npx @badisi/check-updates -i",
+        "typecheck": "tsc --noEmit",
+        "start": "tsx src/cli.ts",
+        "test": "vitest",
+        "test:ci": "vitest run",
+        "build": "tsc --noEmit && tsdown",
+        "release": "npm publish ./dist --access public"
+    },
+    "dependencies": {
+        "@rollup/plugin-virtual": "^3.0.2",
+        "rollup": "^4.62.2"
+    },
+    "devDependencies": {
+        "@types/node": "^26.1.1",
+        "tsdown": "^0.22.8",
+        "tsx": "^4.23.1",
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.10"
+    },
+    "allowScripts": {
+        "esbuild": true,
+        "fsevents": true
+    }
 }
