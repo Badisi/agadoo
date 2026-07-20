@@ -109,12 +109,15 @@ const getOptions = async (): Promise<Options> => {
         rollupOptions = config?.rollup ?? config;
     }
 
-    const input = args[0] ?? await getInput();
-    const absolutePath = resolve(process.cwd(), input);
+    const input = args[0];
+    const absolutePath = input
+        ? (await resolveEntry(resolve(process.cwd(), input))) ?? resolve(process.cwd(), input)
+        : resolve(process.cwd(), await getInput());
+    const relativePath = relative(process.cwd(), absolutePath);
     return {
         rollupOptions,
         absolutePath,
-        relativePath: relative(process.cwd(), absolutePath),
+        relativePath,
     }
 }
 
