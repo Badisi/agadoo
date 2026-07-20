@@ -68,7 +68,7 @@ const displayHelp = () => {
         '    Check whether a package is tree-shakeable.',
         '',
         styleText('bold', 'USAGE:'),
-        '    $ bagadoo [path]',
+        '    $ bagadoo [path] [options]',
         '',
         styleText('bold', 'ARGUMENTS:'),
         `    ${styleText('cyan', '[path]')}             Path to an entry file or package directory`,

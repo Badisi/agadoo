@@ -25,13 +25,12 @@
         "url": "git+https://github.com/Badisi/agadoo.git"
     },
     "keywords": [
-        "modules",
-        "bundlers",
+        "agadoo",
         "rollup",
-        "webpack",
-        "parcel",
+        "analyzer",
+        "checker",
         "tree-shaking",
-        "tree-shakable",
+        "tree-shakeable",
         "esm"
     ],
     "scripts": {
@@ -42,6 +41,9 @@
         "test:ci": "vitest run",
         "build": "tsc --noEmit && tsdown",
         "release": "npm publish ./dist --access public"
+    },
+    "engines": {
+        "node": ">= 20.12.0"
     },
     "dependencies": {
         "@rollup/plugin-virtual": "^3.0.2",

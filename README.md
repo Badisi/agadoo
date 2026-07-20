@@ -1,130 +1,175 @@
-# agadoo
+<h1 align="center">
+    @badisi/agadoo
+</h1>
 
-*[Ag-a-doo-doo-doo, push pineapple, shake the tree](https://www.youtube.com/watch?v=POv-3yIPSWc)*
+<p align="center">
+    🍃 <i>Check whether a package is tree-shakeable.</i><br/>
+</p>
+
+<p align="center">
+    <a href="https://www.npmjs.com/package/@badisi/agadoo">
+        <img src="https://img.shields.io/npm/v/@badisi/agadoo.svg?color=blue&logo=npm" alt="npm version" /></a>
+    <a href="https://npmcharts.com/compare/@badisi/agadoo?minimal=true">
+        <img src="https://img.shields.io/npm/dw/@badisi/agadoo.svg?color=7986CB&logo=npm" alt="npm donwloads" /></a>
+    <a href="https://github.com/Badisi/agadoo/blob/main/LICENSE">
+        <img src="https://img.shields.io/npm/l/@badisi/agadoo.svg?color=ff69b4" alt="license" /></a>
+</p>
+
+<p align="center">
+    <a href="https://github.com/Badisi/agadoo/actions/workflows/ci_tests.yml">
+        <img src="https://img.shields.io/github/actions/workflow/status/badisi/agadoo/ci_tests.yml?logo=github" alt="build status" /></a>
+    <a href="https://github.com/Badisi/agadoo/blob/main/CONTRIBUTING.md#-submitting-a-pull-request-pr">
+        <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome" /></a>
+</p>
+
+<hr/>
+
+#### Tree-shaking
+
+> It is a form of `dead-code elimination` that optimizes your production bundle size by removing unused code.
+>
+> With the advent of JavaScript modules (import and export), it is now possible to build libraries that are `tree-shakeable`. This means that a user of your library can import just the bits they need, without burdening their users with all the code they are *not* using. Modern bundlers use static analysis to track your export dependency graph, automatically pruning the "dead leaves" (unused exports) so that only active code ships to the browser.
+
+<hr/>
 
 
-## What this does
+## Getting started
 
-Tells you whether the JavaScript library you're building is tree-shakeable.
+This tool checks whether your JavaScript library is `tree-shakeable` by analyzing it with [Rollup](https://rollupjs.org).
 
-## What it doesn't do
+> [!NOTE]
+> This project is a revamp of the original [agadoo](https://github.com/Rich-Harris/agadoo) by [Rich Harris](https://github.com/Rich-Harris).
 
-Tell you why tree-shaking fails, if it does. Maybe in a future version.
 
-## Hold up — tree what now?
+## Installation
 
-With the advent of JavaScript modules (`import` and `export`), it's possible to build libraries that are *tree-shakeable*. This means that a user of your library can import just the bits they need, without burdening their users with all the code you're *not* using.
-
-For example, the [eases-jsnext](https://github.com/Rich-Harris/eases-jsnext) library contains a grab-bag of [Robert Penner's easing equations](http://robertpenner.com/easing/), presented as a JavaScript module. I can use it like this in my code...
-
-```js
-import * as eases from 'eases-jsnext';
-
-for (let t = 0; t <= 1; t += 0.05) {
-  const eased = eases.cubicInOut(t)
-  const str = repeat('*', eased * 20);
-  console.log(str);
-}
-
-function repeat(str, num) {
-  let result = '';
-  num = Math.round(num);
-  while (num--) result += str;
-  return result;
-}
+```sh
+npm install -g @badisi/agadoo
 ```
 
-...and all the easing functions that I *haven't* used will get removed during bundling, if I'm using a modern bundler such as Rollup, webpack or Parcel. Here's what that bundle would look like with Rollup:
-
-```js
-'use strict';
-
-function cubicInOut(t) {
-  return t < 0.5
-    ? 4.0 * t * t * t
-    : 0.5 * Math.pow(2.0 * t - 2.0, 3.0) + 1.0
-}
-
-for (let t = 0; t <= 1; t += 0.05) {
-  const eased = cubicInOut(t);
-  const str = repeat('*', eased * 20);
-  console.log(str);
-}
-
-function repeat(str, num) {
-  let result = '';
-  num = Math.round(num);
-  while (num--) result += str;
-  return result;
-}
+```sh
+yarn add @badisi/agadoo
 ```
 
-...and here's the result of running it:
 
+## Usage
+
+```sh
+bagadoo [path] [options]
+
+# or without installation, using `npx` directly:
+npx @badisi/agadoo [path] [options]
 ```
 
-*
-*
-**
-***
-*****
-*******
-**********
-*************
-***************
-*****************
-******************
-*******************
-*******************
-********************
-********************
-********************
+
+#### Arguments
+
+| Argument | Description |
+| :--- | :--- |
+| `path` | Path to an entry file or package directory.</br>*Defaults to reading the `module` or `main` field from `package.json` in the current directory*. |
+
+
+#### Options
+
+| Option | Description |
+| :--- | :--- |
+| `-c, --config <file>` | Path to a Rollup config file for custom plugins, externals, etc. |
+| `-v, --version` | Print version. |
+| `-h, --help` | Show help message. |
+
+
+#### Examples
+
+* **Check the package in the current directory:**
+
+```sh
+bagadoo
 ```
 
-But I digress. The point is that this works because eases-jsnext is a tree-shakeable library.
+* **Check a specific file:**
 
-
-## Using agadoo
-
-Inside your project folder, run Agadoo like so:
-
-```bash
-npx agadoo
+```sh
+bagadoo dist/my-library.js
 ```
 
-You can install it as a development dependency and run it each time you `npm publish` — if tree-shaking fails, publishing will be aborted:
+* **Check a package directory:**
 
-```bash
-npm install -D agadoo
+```sh
+bagadoo packages/my-lib
 ```
 
-```js
-// package.json
+* **Use a custom Rollup config file to handle plugins or mark external dependencies:**
+
+```sh
+bagadoo --config rollup.config.js
+```
+
+* **Add it to your `prepublishOnly` script to prevent publishing if tree-shaking fails:**
+
+```json
 {
   "scripts": {
-    "prepublishOnly": "agadoo"
+    "prepublishOnly": "bagadoo"
   }
 }
 ```
 
-You can specify the module if necessary:
 
-```bash
-agadoo dist/my-library.js
+## API
+
+You can also use agadoo programmatically:
+
+```ts
+import { check } from '@badisi/agadoo';
+
+const result = await check('./dist/my-library.js');
+console.log(result.isShaken); // true or false
+```
+
+Pass custom Rollup options:
+
+```ts
+import { check } from '@badisi/agadoo';
+
+const result = await check('./dist/my-library.js', {
+  external: ['some-external-dep'],
+  plugins: [myPlugin()]
+});
 ```
 
 
-## Help! My library isn't tree-shakeable and I'm not sure why
+## Help! my library isn't tree-shakeable
 
-Firstly, make sure you're exposing a JavaScript module using the "module" field of your package.json (aka [pkg.module](https://github.com/rollup/rollup/wiki/pkg.module)).
+If tree-shaking fails, it means `Rollup` found side-effects in your code.
 
-If tree-shaking still fails, it's because Rollup thinks that there are side-effects somewhere in your code. Follow these guidelines:
+Here are common guidelines:
 
-* Avoid transpilers like Babel and Bublé (and if you're using TypeScript, target a modern version of JavaScript)
-* Export plain functions
-* Don't create instances of things on initial evaluation — instantiate lazily, when the functions you export are called
+* Avoid transpilers like `Babel` and `Bublé` (if you're using TypeScript, target a modern JS version)
+* Export plain functions — don't create instances of things on initial evaluation
+* The output will show the code that remains after tree-shaking to help you diagnose the issue
+
+If your library needs custom Rollup plugins (e.g., to handle non-standard file types), use the `--config` option.
 
 
-## License
+## Development
 
-[LIL](LICENSE).
+See the [developer docs][developer].
+
+
+## Contributing
+
+#### > Want to Help ?
+
+Want to file a bug, contribute some code or improve documentation ? Excellent!
+
+But please read up first on the guidelines for [contributing][contributing], and learn about submission process, coding rules and more.
+
+#### > Code of Conduct
+
+Please read and follow the [Code of Conduct][codeofconduct] and help us keep this project open and inclusive.
+
+
+
+[developer]: https://github.com/Badisi/agadoo/blob/main/DEVELOPER.md
+[contributing]: https://github.com/Badisi/agadoo/blob/main/CONTRIBUTING.md
+[codeofconduct]: https://github.com/Badisi/agadoo/blob/main/CODE_OF_CONDUCT.md
