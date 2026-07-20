@@ -131,11 +131,15 @@ void (async (): Promise<void> => {
     } else {
         const options = await getOptions();
         const result = await check(options.absolutePath, options.rollupOptions);
+        result.warnings.forEach(w => console.error(styleText('yellow', w)));
+        result.code.split('\n').forEach(line => {
+            const t = line.trim();
+            console.error(t.startsWith('//#region') || t.startsWith('//#endregion') ? styleText('gray', line) : line);
+        });
         if (result.isShaken) {
-            console.log(styleText('green', 'Success!') + ' ' + styleText('cyan', options.relativePath) + ' is fully tree-shakeable');
+            console.log(`\n${styleText('green', '✓ Success:')} ${styleText('cyan', options.relativePath)} ${styleText('green', 'is fully tree-shakeable.')}`);
         } else {
-            console.log(`${result.code}\n`);
-            exitWithError(styleText('red', 'Failed to tree-shake ' + options.relativePath));
+            exitWithError(`\n${styleText('red', '✗ Failed:')} ${styleText('cyan', options.relativePath)} ${styleText('red', 'is not fully tree-shakeable.')}`);
         }
     }
 })();

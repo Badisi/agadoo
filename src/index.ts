@@ -4,10 +4,12 @@ import virtual from '@rollup/plugin-virtual';
 export interface CheckResult {
     isShaken: boolean;
     code: string;
+    warnings: string[];
 }
 
 export const check = async (path: string, rollupOptions?: Partial<RollupOptions>): Promise<CheckResult> => {
     const { plugins, onwarn, ...restOptions } = rollupOptions ?? {};
+    const warnings: string[] = [];
 
     const bundle = await rollup({
         ...restOptions,
@@ -22,7 +24,7 @@ export const check = async (path: string, rollupOptions?: Partial<RollupOptions>
             if (onwarn) {
                 onwarn(warning, handle);
             } else if (warning.code !== 'EMPTY_BUNDLE') {
-                handle(warning);
+                warnings.push(warning.message);
             }
         },
     });
@@ -33,5 +35,5 @@ export const check = async (path: string, rollupOptions?: Partial<RollupOptions>
         const t = line.trim();
         return t && !t.startsWith('import ') && !t.startsWith('//') && !t.startsWith('/*') && !t.startsWith('*') && !t.startsWith('*/');
     });
-    return { isShaken, code };
+    return { isShaken, code, warnings };
 };
