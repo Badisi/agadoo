@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 
@@ -35,5 +35,25 @@ describe('check', () => {
                 expect(result.isShaken).toBe(false);
             });
         }
+    });
+
+    describe('with custom rollup options', () => {
+        it('forwards onwarn handler', async () => {
+            const onwarn = vi.fn();
+            const result = await check(resolve(testDir, 'pass/simple/index.js'), { onwarn });
+            expect(result.isShaken).toBe(true);
+            expect(onwarn).toHaveBeenCalledOnce();
+            expect(onwarn).toHaveBeenCalledWith(
+                expect.objectContaining({ code: 'EMPTY_BUNDLE' }),
+                expect.any(Function)
+            );
+        });
+
+        it('forwards external option', async () => {
+            const result = await check(resolve(testDir, 'pass/external-imports/index.js'), {
+                external: [/^foo$/],
+            });
+            expect(result.isShaken).toBe(true);
+        });
     });
 });

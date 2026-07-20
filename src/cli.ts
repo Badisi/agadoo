@@ -1,9 +1,17 @@
 import { access, readFile, stat } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { styleText } from 'node:util';
-import { version as packageVersion } from '../package.json';
+import type { RollupOptions } from 'rollup';
 
+import { version as packageVersion } from '../package.json';
 import { check } from './index';
+
+interface Options {
+    rollupOptions?: RollupOptions;
+    absolutePath: string;
+    relativePath: string;
+}
 
 const exitWithError = (message: string): never => {
     console.error(message);
@@ -67,10 +75,48 @@ const displayHelp = () => {
         `    ${styleText(['gray', 'italic'], '                   (default: read module or main from package.json)')}`,
         '',
         styleText('bold', 'OPTIONS:'),
-        `    ${styleText('cyan', '-v, --version')}      Print version`,
-        `    ${styleText('cyan', '-h, --help')}         Show this help message`,
+        `    ${styleText('cyan', '-c, --config <file>')}  Path to a Rollup config file`,
+        `    ${styleText('cyan', '-v, --version')}        Print version`,
+        `    ${styleText('cyan', '-h, --help')}           Show this help message`,
     ].join('\n'));
 };
+
+const getOptions = async (): Promise<Options> => {
+    const args = process.argv.slice(2);
+    let configPath: string | undefined;
+
+    const configIndex = args.findIndex(a => a.startsWith('--config=') || a.startsWith('-c='));
+    if (configIndex !== -1) {
+        const match = args[configIndex];
+        configPath = match.slice(match.indexOf('=') + 1);
+        args.splice(configIndex, 1);
+    }
+
+    for (const flag of ['--config', '-c']) {
+        const idx = args.indexOf(flag);
+        if (idx !== -1) {
+            configPath = args[idx + 1];
+            args.splice(idx, 2);
+            break;
+        }
+    }
+
+    let rollupOptions: Partial<RollupOptions> | undefined;
+    if (configPath) {
+        const absoluteConfigPath = resolve(process.cwd(), configPath);
+        const configModule = await import(pathToFileURL(absoluteConfigPath).href);
+        const config = configModule.default ?? configModule;
+        rollupOptions = config?.rollup ?? config;
+    }
+
+    const input = args[0] ?? await getInput();
+    const absolutePath = resolve(process.cwd(), input);
+    return {
+        rollupOptions,
+        absolutePath,
+        relativePath: relative(process.cwd(), absolutePath),
+    }
+}
 
 void (async (): Promise<void> => {
     if (process.argv.includes('--version') || process.argv.includes('-v')) {
@@ -80,16 +126,13 @@ void (async (): Promise<void> => {
         displayHelp();
         process.exit();
     } else {
-        const input = process.argv[2] ?? await getInput();
-        const absolutePath = resolve(process.cwd(), input);
-        const relativePath = relative(process.cwd(), absolutePath);
-
-        const result = await check(absolutePath);
+        const options = await getOptions();
+        const result = await check(options.absolutePath, options.rollupOptions);
         if (result.isShaken) {
-            console.log(styleText('green', 'Success!') + ' ' + styleText('cyan', relativePath) + ' is fully tree-shakeable');
+            console.log(styleText('green', 'Success!') + ' ' + styleText('cyan', options.relativePath) + ' is fully tree-shakeable');
         } else {
             console.log(`${result.code}\n`);
-            exitWithError(styleText('red', 'Failed to tree-shake ' + relativePath));
+            exitWithError(styleText('red', 'Failed to tree-shake ' + options.relativePath));
         }
     }
 })();
