@@ -1,5 +1,4 @@
-import { rollup } from 'rollup';
-import type { RollupOptions } from 'rollup';
+import { rollup, type RollupOptions } from 'rollup';
 import virtual from '@rollup/plugin-virtual';
 
 export interface CheckResult {

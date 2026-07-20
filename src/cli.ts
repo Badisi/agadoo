@@ -47,12 +47,12 @@ const getInput = async (): Promise<string> => {
     try {
         pkgJson = JSON.parse(await readFile('package.json', 'utf-8'));
     } catch {
-        exitWithError('Could not find or parse `package.json`');
+        exitWithError(`Could not find or parse 'package.json'`);
     }
     const name = pkgJson.module ?? pkgJson.main ?? 'index';
     const entryPath = await resolveEntry(name);
     if (!entryPath) {
-        exitWithError(`Could not resolve entry point: ${name}`);
+        exitWithError(`Could not resolve entry point '${name}' from package.json`);
     }
     return entryPath!;
 };
