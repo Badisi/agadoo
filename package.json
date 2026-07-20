@@ -13,6 +13,7 @@
     "module": "./index.mjs",
     "exports": {
         ".": {
+            "types": "./index.d.mts",
             "default": "./index.mjs"
         },
         "./package.json": "./package.json"

@@ -2,10 +2,16 @@ import { copyFileSync, cpSync, readFileSync, writeFileSync } from 'node:fs';
 import { defineConfig, type UserConfig } from 'tsdown';
 
 const config: UserConfig[] = defineConfig([{
-    entry: ['src/index.ts'],
+    entry: ['src/cli.ts'],
     format: ['esm'],
     clean: true,
     dts: false,
+    sourcemap: false
+}, {
+    entry: ['src/index.ts'],
+    format: ['esm'],
+    clean: true,
+    dts: true,
     sourcemap: false,
     onSuccess: (): void => {
         const pkgJson = JSON.parse(readFileSync('package.json', 'utf8')) as Record<string, unknown>;
