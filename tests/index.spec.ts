@@ -11,6 +11,7 @@ const passFixtures = [
     { name: 'external-imports', entry: 'pass/external-imports/index.js' },
     { name: 'class', entry: 'pass/class/index.js' },
     { name: 'reexport', entry: 'pass/reexport/index.js' },
+    { name: 'comments', entry: 'pass/comments/index.js' },
 ];
 
 const failFixtures = [

@@ -32,7 +32,7 @@ export const check = async (path: string, rollupOptions?: Partial<RollupOptions>
     const code = output[0].code.trim();
     const isShaken = !code.split('\n').some(line => {
         const t = line.trim();
-        return t && !t.startsWith('import ') && !t.startsWith('//#region') && !t.startsWith('//#endregion');
+        return t && !t.startsWith('import ') && !t.startsWith('//') && !t.startsWith('/*') && !t.startsWith('*') && !t.startsWith('*/');
     });
     return { isShaken, code };
 };
