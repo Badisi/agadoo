@@ -1,10 +1,10 @@
-import { access, readFile, stat } from 'node:fs/promises';
 import { relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { styleText } from 'node:util';
 import type { RollupOptions } from 'rollup';
 
 import { version as packageVersion } from '../package.json';
+import { resolveEntry } from './cli-utils';
 import { check } from './index';
 
 interface Options {
@@ -12,50 +12,6 @@ interface Options {
     absolutePath: string;
     relativePath: string;
 }
-
-const exitWithError = (message: string): never => {
-    console.error(message);
-    process.exit(1);
-};
-
-const ifExists = async (path: string): Promise<string | null> => {
-    try {
-        await access(path);
-        return path;
-    } catch {
-        return null;
-    }
-};
-
-const isDirectory = async (path: string): Promise<boolean> => {
-    try {
-        return (await stat(path)).isDirectory();
-    } catch {
-        return false;
-    }
-};
-
-const resolveEntry = async (value: string): Promise<string | null> => {
-    if (await isDirectory(value)) {
-        return (await ifExists(`${value}/index.mjs`)) ?? (await ifExists(`${value}/index.js`));
-    }
-    return (await ifExists(value)) ?? (await ifExists(`${value}.mjs`)) ?? (await ifExists(`${value}.js`));
-};
-
-const getInput = async (): Promise<string> => {
-    let pkgJson;
-    try {
-        pkgJson = JSON.parse(await readFile('package.json', 'utf-8'));
-    } catch {
-        exitWithError(`Could not find or parse 'package.json'`);
-    }
-    const name = pkgJson.module ?? pkgJson.main ?? 'index';
-    const entryPath = await resolveEntry(name);
-    if (!entryPath) {
-        exitWithError(`Could not resolve entry point '${name}' from package.json`);
-    }
-    return entryPath!;
-};
 
 const displayHelp = () => {
     console.log([
@@ -110,9 +66,7 @@ const getOptions = async (): Promise<Options> => {
     }
 
     const input = args[0];
-    const absolutePath = input
-        ? (await resolveEntry(resolve(process.cwd(), input))) ?? resolve(process.cwd(), input)
-        : resolve(process.cwd(), await getInput());
+    const absolutePath = await resolveEntry(input ? resolve(process.cwd(), input) : process.cwd());
     const relativePath = relative(process.cwd(), absolutePath);
     return {
         rollupOptions,

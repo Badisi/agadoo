@@ -32,8 +32,13 @@ export const check = async (path: string, rollupOptions?: Partial<RollupOptions>
     const { output } = await bundle.generate({ format: 'esm' });
     const code = output[0].code.trim();
     const isShaken = !code.split('\n').some(line => {
-        const t = line.trim();
-        return t && !t.startsWith('import ') && !t.startsWith('//') && !t.startsWith('/*') && !t.startsWith('*') && !t.startsWith('*/');
+        const trimmedLine = line.trim();
+        return trimmedLine
+            && !trimmedLine.startsWith('import ')
+            && !trimmedLine.startsWith('//')
+            && !trimmedLine.startsWith('/*')
+            && !trimmedLine.startsWith('*')
+            && !trimmedLine.startsWith('*/');
     });
     return { isShaken, code, warnings };
 };

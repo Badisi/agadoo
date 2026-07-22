@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 
+import { resolveEntry } from '../src/cli-utils';
 import { check } from '../src/index';
 
 const testDir = fileURLToPath(new URL('.', import.meta.url));
@@ -33,6 +34,24 @@ describe('check', () => {
         for (const { name, entry } of failFixtures) {
             it(name, async () => {
                 const result = await check(resolve(testDir, entry));
+                expect(result.isShaken).toBe(false);
+            });
+        }
+    });
+
+    describe('directory input', () => {
+        for (const { name, entry } of passFixtures) {
+            it(name, async () => {
+                const resolved = await resolveEntry(resolve(testDir, entry.replace('/index.js', '')));
+                const result = await check(resolved!);
+                expect(result.isShaken).toBe(true);
+            });
+        }
+
+        for (const { name, entry } of failFixtures) {
+            it(name, async () => {
+                const resolved = await resolveEntry(resolve(testDir, entry.replace('/index.js', '')));
+                const result = await check(resolved!);
                 expect(result.isShaken).toBe(false);
             });
         }
