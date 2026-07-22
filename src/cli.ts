@@ -72,8 +72,8 @@ const getOptions = async (): Promise<Options> => {
         rollupOptions,
         absolutePath,
         relativePath,
-    }
-}
+    };
+};
 
 void (async (): Promise<void> => {
     if (process.argv.includes('--version') || process.argv.includes('-v')) {
@@ -87,13 +87,14 @@ void (async (): Promise<void> => {
         const result = await check(options.absolutePath, options.rollupOptions);
         result.warnings.forEach(w => console.error(styleText('yellow', w)));
         result.code.split('\n').forEach(line => {
-            const t = line.trim();
-            console.error(t.startsWith('//#region') || t.startsWith('//#endregion') ? styleText('gray', line) : line);
+            const trimmedLine = line.trim();
+            const isRegion = trimmedLine.startsWith('//#region') || trimmedLine.startsWith('//#endregion');
+            console.error(isRegion ? styleText('gray', line) : line);
         });
         if (result.isShaken) {
             console.log(`\n${styleText('green', '✓ Success:')} ${styleText('cyan', options.relativePath)} ${styleText('green', 'is fully tree-shakeable.')}`);
         } else {
-            exitWithError(`\n${styleText('red', '✗ Failed:')} ${styleText('cyan', options.relativePath)} ${styleText('red', 'is not fully tree-shakeable.')}`);
+            console.error(`\n${styleText('red', '✗ Failed:')} ${styleText('cyan', options.relativePath)} ${styleText('red', 'is not fully tree-shakeable.')}`);
         }
     }
 })();

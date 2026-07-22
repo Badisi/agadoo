@@ -30,7 +30,21 @@ export const check = async (path: string, rollupOptions?: Partial<RollupOptions>
     });
 
     const { output } = await bundle.generate({ format: 'esm' });
-    const code = output[0].code.trim();
+
+    // Fix the orphaned region comments issue
+    let openRegionsCount = 0;
+    const processed = output[0].code.trim().split('\n').filter(line => {
+        const trimmedLine = line.trim();
+        if (trimmedLine.startsWith('//#region ')) {
+            return ++openRegionsCount;
+        } else if (trimmedLine.startsWith('//#endregion')) {
+            return (openRegionsCount > 0) ? openRegionsCount-- : false;
+        }
+        return true;
+    });
+    const code = [...processed, ...Array(openRegionsCount).fill('//#endregion')].join('\n');
+    // ---
+
     const isShaken = !code.split('\n').some(line => {
         const trimmedLine = line.trim();
         return trimmedLine
