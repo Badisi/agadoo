@@ -27,13 +27,13 @@ const exitWithError = (message: string): never => {
 const resolveEntry = async (value: string): Promise<string | never> => {
     if (await isDirectory(value)) {
         try {
-            const pkgJson = JSON.parse(await readFile(`${value}/package.json`, 'utf-8'));
+            const pkgJson = JSON.parse(await readFile(resolve(value, 'package.json'), 'utf-8'));
             const name = pkgJson.module ?? pkgJson.main;
             if (name) {
                 return await resolveEntry(resolve(value, name));
             }
         } catch { /* invalid or missing package.json —> fall through to index file check */ }
-        const indexEntry = (await ifExists(`${value}/index.mjs`)) ?? (await ifExists(`${value}/index.js`));
+        const indexEntry = (await ifExists(resolve(value, 'index.mjs'))) ?? (await ifExists(resolve(value, 'index.js')));
         return indexEntry ?? exitWithError(`Could not resolve entry point in '${value}'`);
     } else {
         const fileEntry = (await ifExists(value)) ?? (await ifExists(`${value}.mjs`)) ?? (await ifExists(`${value}.js`));
