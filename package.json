@@ -1,6 +1,6 @@
 {
     "name": "@badisi/agadoo",
-    "version": "4.0.2",
+    "version": "4.0.3",
     "description": "Check whether a package is tree-shakeable.",
     "homepage": "https://github.com/Badisi/agadoo",
     "license": "MIT",
