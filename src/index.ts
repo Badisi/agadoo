@@ -56,7 +56,7 @@ export const check = async (path: string, rollupOptions?: Partial<RollupOptions>
         ...restOptions,
         input: '__badisi_agadoo__',
         plugins: [
-            virtual({
+            (virtual as any)({
                 __badisi_agadoo__: `import * as __agadoo__ from ${JSON.stringify(path)}`
             }),
             ...(Array.isArray(plugins) ? plugins : (plugins ? [plugins] : [])),

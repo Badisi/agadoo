@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 
-import { resolveEntry } from '../src/cli-utils';
+import { resolveEntry } from '../src/cli-utils.js';
 
 const testDir = fileURLToPath(new URL('.', import.meta.url));
 

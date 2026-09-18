@@ -3,9 +3,9 @@ import { pathToFileURL } from 'node:url';
 import { styleText } from 'node:util';
 import type { RollupOptions } from 'rollup';
 
-import { version as packageVersion } from '../package.json';
-import { resolveEntry } from './cli-utils';
-import { check } from './index';
+import packageJson from '../package.json' with { type: 'json' };
+import { resolveEntry } from './cli-utils.js';
+import { check } from './index.js';
 
 interface Options {
     rollupOptions?: RollupOptions;
@@ -18,7 +18,7 @@ const displayHelp = () => {
         `🍃 ${styleText(['bgGreen', 'black'], ' bagadoo ')}`,
         '',
         styleText('bold', 'VERSION:'),
-        `    ${styleText('green', packageVersion)}`,
+        `    ${styleText('green', packageJson.version)}`,
         '',
         styleText('bold', 'DESCRIPTION:'),
         '    Check whether a package is tree-shakeable.',
@@ -77,7 +77,7 @@ const getOptions = async (): Promise<Options> => {
 
 void (async (): Promise<void> => {
     if (process.argv.includes('--version') || process.argv.includes('-v')) {
-        console.log(packageVersion);
+        console.log(packageJson.version);
         process.exit();
     } else if (process.argv.includes('--help') || process.argv.includes('-h')) {
         displayHelp();

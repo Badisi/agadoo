@@ -2,8 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
 
-import { resolveEntry } from '../src/cli-utils';
-import { check } from '../src/index';
+import { resolveEntry } from '../src/cli-utils.js';
+import { check } from '../src/index.js';
 
 const testDir = fileURLToPath(new URL('.', import.meta.url));
 
